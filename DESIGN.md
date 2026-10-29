@@ -1,11 +1,11 @@
-# drip: design
+# pantry: design
 
 Find the subscriptions quietly draining your account. Drop in a bank statement, get the list, the yearly cost and a way to cancel. Runs in the browser. Nothing is uploaded.
 
 Status: design only. Nothing is built yet.
 Last updated: 2026-10-29.
 Owner: tuftle (tuftle@proton.me). Part of the Tuftle family (wren, nook, burrow).
-Working name: **drip**. Alternatives if the name is taken: trickle, steady. The owner decides before anything is built (section 16).
+Working name: **pantry** (you go and look at what has gone stale at the back). Alternatives if the name is taken: larder, cellar. The owner decides before anything is built (section 16).
 
 ---
 
@@ -27,7 +27,7 @@ If this file and the owner disagree, the owner wins. If something here is wrong 
 
 ## 1. What it is
 
-A single web page. The visitor drops one or more bank or card statement files (CSV). In a few seconds, drip shows:
+A single web page. The visitor drops one or more bank or card statement files (CSV). In a few seconds, pantry shows:
 
 - every recurring charge it found, grouped by how sure it is
 - what each costs per month and per year, and the total
@@ -55,10 +55,10 @@ Goals
 
 Non-goals (not in version 1)
 - Bank connections (Plaid and similar), accounts, sync, a mobile app.
-- A budgeting tool. drip only looks at recurring charges.
+- A budgeting tool. pantry only looks at recurring charges.
 - PDF statements. (Asked for often. Possible later with pdf.js. Out of scope now.)
 - Currency conversion. No network means no rates. Amounts stay in the statement's currency.
-- Advice. drip says "worth a look", never "you should cancel".
+- Advice. pantry says "worth a look", never "you should cancel".
 
 Anti-goals (would make it a failure even if it works)
 - Any network request that carries user data, including by accident.
@@ -70,7 +70,7 @@ Anti-goals (would make it a failure even if it works)
 
 One page, five states. Copy below is a starting point.
 
-1. **landing.** Headline: "find the subscriptions quietly draining your account." Sub: "drop in a bank statement. drip finds what repeats, what it costs a year, and where to cancel. it all happens in this page. nothing is uploaded." A big drop zone: "drop a statement here, or choose a file". Under it: "try it with example data" (loads `sample/example-statement.csv`). A small line: "works offline. try it with wi-fi off." and a link "how do i know?" (section 10).
+1. **landing.** Headline: "find the subscriptions quietly draining your account." Sub: "drop in a bank statement. pantry finds what repeats, what it costs a year, and where to cancel. it all happens in this page. nothing is uploaded." A big drop zone: "drop a statement here, or choose a file". Under it: "try it with example data" (loads `sample/example-statement.csv`). A small line: "works offline. try it with wi-fi off." and a link "how do i know?" (section 10).
 2. **check the columns.** After parsing, a compact preview of the first 8 rows with the guessed columns highlighted: date, description, amount. Three dropdowns to correct a wrong guess. One question only when truly ambiguous: "is 03/04/2026 the 3rd of april or the 4th of march?" and "are charges shown as negative numbers?" with a toggle. Button: "looks right".
 3. **results.**
    - A summary band: "14 subscriptions, 1,326 a year" in large serif, with "(about 110 a month)" and the statement's date span.
@@ -216,7 +216,7 @@ Per item: keep, worth a look, cancel, not a subscription. Stored in memory. Opti
 The example values above are placeholders from memory and must be verified. Treat every URL and price as unverified until checked.
 
 Rules
-- **Processor-aware cancel help.** If the charge is billed by Apple or Google, show the Apple or Google subscription steps instead of the merchant's page. This is one of drip's most useful details.
+- **Processor-aware cancel help.** If the charge is billed by Apple or Google, show the Apple or Google subscription steps instead of the merchant's page. This is one of pantry's most useful details.
 - **Prefer stable help-centre links** over deep links that rot. Each entry has `lastChecked`. The UI shows "link checked <date>" and a "report a broken link" button that opens a prefilled GitHub issue containing no user data.
 - **Never fetch at runtime.** The catalogue ships with the page.
 - **`scripts/check-links.mjs`** (run by the owner locally, needs network) sends HEAD requests to every URL, reports failures and updates `lastChecked`. The cloud session may write it but must not run it against the live web unless asked.
@@ -229,7 +229,7 @@ Rules
 Static site, vanilla ES modules, no build step for the page itself. All logic in DOM-free modules so Node can test it.
 
 ```
-drip/
+pantry/
   DESIGN.md                 this file
   README.md                 short, in Tuftle style (see section 18)
   package.json              type: module, scripts: test, privacy-scan, make-fixtures, build-single
@@ -262,7 +262,7 @@ drip/
 
 The worker takes `File[]` (or text) and returns a plain result object. The main thread never parses or analyses, so the page stays responsive on large statements.
 
-`scripts/build-single.mjs` produces `dist/drip.html`: the whole app inlined into one file. Offer it as a download ("save this page and open it offline"). It is a strong trust signal.
+`scripts/build-single.mjs` produces `dist/pantry.html`: the whole app inlined into one file. Offer it as a download ("save this page and open it offline"). It is a strong trust signal.
 
 ## 9. Design
 
@@ -285,7 +285,7 @@ Follows the Tuftle look. Reuse these exact tokens.
 - The headline numbers are large serif. Savings use `--leaf`. Warnings (price rise) use the link colour, never red.
 - Motion: gentle count-up on the summary, nothing else. Respect `prefers-reduced-motion`.
 - Accessibility: keyboard reachable drop zone (also a real file input), visible focus, contrast at least 4.5:1, labels on every control, announce results with `aria-live`, no information carried by colour alone. Works at 360 px wide.
-- The share card: 1080 by 1350, cream background, big serif numbers, one line "found with drip. it ran in my browser and nothing was uploaded." No service logos (trademarks), no names unless the visitor opts in.
+- The share card: 1080 by 1350, cream background, big serif numbers, one line "found with pantry. it ran in my browser and nothing was uploaded." No service logos (trademarks), no names unless the visitor opts in.
 
 ## 10. Privacy and security design
 
@@ -329,13 +329,13 @@ A seeded pseudo-random generator that writes statements and a `truth.json` listi
 
 ### 11.3 Real statements (owner only)
 
-The owner runs drip on their own statements and reports problems using the redact helper's output, never the file. Real-world format failures become new fixtures.
+The owner runs pantry on their own statements and reports problems using the redact helper's output, never the file. Real-world format failures become new fixtures.
 
 ## 12. Deployment
 
-- A Vercel static project named `drip`, serving `site/`, under the owner's account. `vercel.json` sets the headers in section 10 and clean URLs. No functions, no environment variables, no secrets.
-- Domain later: the owner plans tuftle.com. Until then `drip.vercel.app` or `tuftle.vercel.app/drip` (a folder in the tuftle site repo) are both fine.
-- GitHub repository `Tuftle/drip`, public, MPL 2.0 for the code like the other Tuftle projects, CC0 for `catalogue.json`. Licence choice is the owner's.
+- A Vercel static project named `pantry`, serving `site/`, under the owner's account. `vercel.json` sets the headers in section 10 and clean URLs. No functions, no environment variables, no secrets.
+- Domain later: the owner plans tuftle.com. Until then `pantry.vercel.app` or `tuftle.vercel.app/pantry` (a folder in the tuftle site repo) are both fine.
+- GitHub repository `Tuftle/pantry`, public, MPL 2.0 for the code like the other Tuftle projects, CC0 for `catalogue.json`. Licence choice is the owner's.
 - The agent prepares everything and stops. The owner runs `vercel deploy --prod --yes`.
 
 ## 13. Milestones and acceptance
@@ -354,7 +354,7 @@ Each milestone ends with tests passing and a report.
 ## 14. Launch plan
 
 - Timing: ready by mid December. Launch the first Tuesday to Thursday of January, 8 to 10 in the morning US Eastern, when people clear subscriptions. A soft Black Friday mention is optional.
-- **Hacker News:** "Show HN: drip, find forgotten subscriptions from a bank CSV, entirely in your browser". The link goes straight to the working page (no sign-up). The first comment explains how recurrence is detected and how to verify the privacy claim. The author stays in the thread for the first hours.
+- **Hacker News:** "Show HN: pantry, find forgotten subscriptions from a bank CSV, entirely in your browser". The link goes straight to the working page (no sign-up). The first comment explains how recurrence is detected and how to verify the privacy claim. The author stays in the thread for the first hours.
 - **X:** a 20 second screen recording: drop file, results appear, savings counter, share card. One sentence: "found 14 subscriptions, 1,326 a year. it never left my laptop." Post the card, not the list.
 - A "how it works" post covers the recurring-charge algorithm, the messy merchant string problem and the CSP. Technical readers like that.
 - Honest odds: nobody can promise a top-10 spot. This has a real need, a personal result and a checkable privacy claim, which are the things that tend to travel. Execution quality decides it.
@@ -363,16 +363,16 @@ Each milestone ends with tests passing and a report.
 
 - **Accuracy on real statements** is the main risk. Mitigations: wide fixture coverage, visible reasons, "maybe" tier, easy correction, redact helper for reports.
 - **Catalogue rot.** Cancel links change. Mitigation: help-centre links, `lastChecked`, report button, honest labels.
-- **Name collision.** "drip" is a common word and brand. Check the name and domains first (section 16).
+- **Name collision.** "pantry" is a common word and brand. Check the name and domains first (section 16).
 - **Legal.** Say plainly it is not financial advice and not affiliated with any service. Use service names as plain text only.
 - **Statements are sensitive.** Even local-only, people hesitate. The proof panel and single-file build exist for them.
 - **Peak season.** January is the best window and also crowded. Be ready early.
 
 ## 16. Decisions for the owner before building
 
-1. Final name (drip, trickle, steady, other) and whether a domain is wanted now.
+1. Final name (pantry, larder, cellar, other) and whether a domain is wanted now.
 2. Regions for the first catalogue (suggested: US, GB, EU).
-3. Repo and licence (suggested: public `Tuftle/drip`, MPL 2.0 code, CC0 catalogue).
+3. Repo and licence (suggested: public `Tuftle/pantry`, MPL 2.0 code, CC0 catalogue).
 4. Whether the share card may ever show service names (suggested: opt-in only).
 5. Whether to also offer the single-file download at launch (suggested: yes).
 
